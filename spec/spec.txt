@@ -1,0 +1,63 @@
+This document provides information regarding the specification of the direct mapped cache and main memory subsystems modelled in this project.
+
+1. Direct Mapped Cache
+
+1.1 Architecture
+
+The direct mapped cache has a reconfigurable architecture where the number of cache lines, size of each cache line, size of each data element and the size of the address bus can be configured through SystemVerilog parameters. 
+
+1.2 Microarchitecture
+
+The direct mapped cache exposes the following input and output ports:
+
+Input - clk - System Clock
+Input - flush - Reset Signal
+Input - addr - Address signal (ADDR_WIDTH bits)
+Input - addr_en - Address enable signal
+Input/Output - data - Data signal (DATA_WIDTH bits)
+Input - data_vld - Data valid signal
+Input - is_rd - Read/Write Indicator
+Output - is_hit - Indicates whether the memory request was a hit in the cache
+Output - cache_busy - Indicates whether cache is busy
+Output - addr_main - Address port to main memory (ADDR_WIDTH bits)
+Output - addr_main_en - Main memory address enable
+Input/Output - data_main - Data port to main memory (DATA_WIDTH bits)
+Output - data_main_vld - Main memory data port valid
+
+
+Setting flush high for a cycle will invalidate the cache and reset all internal registers. The main memory is not affected.
+
+Read and Write requests are sent by setting the address on the 'addr' bus, optionally setting the data on the 'data' bus and enabling the address and the data buses. The is_rd signal must be asserted in case of a read. Addtionally the cache can only accept requests when cache_busy is deasserted, else behavior is unspecified.
+
+A hit in the cache (read or write) will take a single cycle. If the corresponding cache line is empty (holds invalid data) a write will take one cycle while a read will take two cycles.
+
+[TODO] If the corresponding cache line is in a dirty state, the cache line will first have to be committed to main memory and then replaced. In such a case a reads and writes will take 3 cycles.
+
+If the corresonding cache line is not in a dirty state, the cache line can simply be replaced and so reads and writes take 2 cycles.
+
+The cache is a allocate-on-write, write-back cache. There is no mechanism to support multiple caches multiple caches with the same main memory, that is there is no coherency or consistency support.
+
+Besides an array to model memory, the code also contains another array to model meta-data such as dirty_bit, present_bit and replacement data bits (currently unused).
+
+The inputs need to be asserted for only a single cycle and do not need to be held steady while waiting for a response from the cache.
+
+[TODO] There will be a valid_out signal from the cache that indicates when the requested data is on the data bus. 
+
+
+2 Main memory
+
+2.1 Architecture
+The main memory is a very simple model that simply returns or writes data in a single clock cycle.
+
+2.2 Microarchitecture
+
+The main memory module has the following ports:
+
+Input - addr - input address (ADDR_WIDTH bits)
+Input - addr_en - input address enable
+Input - data_vld - data valid signal
+Input/Output - data - data signal (DATA_WIDTH bits)
+Input - flush - Reset Signal for Main Memory (Not Implemented)
+
+The main memory does not need a data output valid signal because it is guaranteed to return data in a single clock cycle.
+
