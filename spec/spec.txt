@@ -17,6 +17,7 @@ Input - addr_en - Address enable signal
 Input/Output - data - Data signal (DATA_WIDTH bits)
 Input - data_vld - Data valid signal
 Input - is_rd - Read/Write Indicator
+Output - data_vld_out - Output data valid indicator
 Output - is_hit - Indicates whether the memory request was a hit in the cache
 Output - cache_busy - Indicates whether cache is busy
 Output - addr_main - Address port to main memory (ADDR_WIDTH bits)
@@ -31,7 +32,7 @@ Read and Write requests are sent by setting the address on the 'addr' bus, optio
 
 A hit in the cache (read or write) will take a single cycle. If the corresponding cache line is empty (holds invalid data) a write will take one cycle while a read will take two cycles.
 
-[TODO] If the corresponding cache line is in a dirty state, the cache line will first have to be committed to main memory and then replaced. In such a case a reads and writes will take 3 cycles.
+If the corresponding cache line is in a dirty state, the cache line will first have to be committed to main memory and then replaced. In such a case a reads and writes will take 3 cycles.
 
 If the corresonding cache line is not in a dirty state, the cache line can simply be replaced and so reads and writes take 2 cycles.
 
@@ -41,7 +42,7 @@ Besides an array to model memory, the code also contains another array to model 
 
 The inputs need to be asserted for only a single cycle and do not need to be held steady while waiting for a response from the cache.
 
-[TODO] There will be a valid_out signal from the cache that indicates when the requested data is on the data bus. 
+There will be a valid_out signal from the cache that indicates when the requested data is on the data bus. 
 
 
 2 Main memory

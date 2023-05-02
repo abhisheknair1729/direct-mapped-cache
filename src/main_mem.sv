@@ -1,5 +1,5 @@
 module main_mem #(parameter ADDR_WIDTH=16,
-                  parameter DATA_WIDTH=8) 
+                  parameter DATA_WIDTH=32) 
                   (clk, addr, addr_en, data, data_vld, flush );
 
     input wire clk;

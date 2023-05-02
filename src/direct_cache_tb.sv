@@ -17,7 +17,7 @@ parameter NUM_SETS=4) ();
     wire cache_busy;
     wire [ADDR_WIDTH-1:0] addr_main;
     wire addr_main_en;
-    wire [DATA_WIDTH-1:0] data_main;
+    wire [CACHE_WORD_WIDTH-1:0] data_main;
     wire data_main_vld;
 
     assign cpu_data_vld = cpu_data_vld_; 
