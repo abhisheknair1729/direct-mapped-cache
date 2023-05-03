@@ -1,4 +1,4 @@
-module direct_cache #(
+module cache #(
   parameter ADDR_WIDTH=16,
   parameter DATA_WIDTH=8,
   parameter CACHE_SIZE=16,
@@ -35,9 +35,9 @@ module direct_cache #(
     parameter HISTORY_BITS_POS_START = META_DATA_WIDTH - TAG_WIDTH - 3;
     parameter HISTORY_BITS_POS_END = META_DATA_WIDTH - TAG_WIDTH - 2 - REP_POL_SIZE;
     //CACHE MEMORY
-    reg [$clog2(CACHE_SIZE)-1:0][CACHE_WORD_WIDTH-1:0] mem;
+    reg [CACHE_SIZE-1:0][CACHE_WORD_WIDTH-1:0] mem;
     //cache meta data
-    reg [$clog2(CACHE_SIZE)-1:0][META_DATA_WIDTH-1:0] meta;
+    reg [CACHE_SIZE-1:0][META_DATA_WIDTH-1:0] meta;
     
     reg [ADDR_WIDTH-1:0] addr_;
     reg [DATA_WIDTH-1:0] data_;
@@ -85,7 +85,6 @@ module direct_cache #(
         if( cache_busy_ && is_rd_ && !read_pending_ ) begin
             if( meta[cache_idx][META_DATA_WIDTH-1 -:TAG_WIDTH] == tag && is_present ) begin
                 /* read hit */
-                //$display("Read Hit");
                 is_hit_ <= 1'b1;
                 data_ <= mem[cache_idx][offset*DATA_WIDTH +: DATA_WIDTH];
                 data_vld_ <= 1'b1;
@@ -131,6 +130,7 @@ module direct_cache #(
                 cache_busy_ <= 1'b0;
                 write_pending_ <= 1'b0;
                 meta[cache_idx][DIRTY_BIT_POS] <= 1'b1;
+                meta[cache_idx][PRESENT_BIT_POS] <= 1'b1;
             end 
             else if( meta[cache_idx][META_DATA_WIDTH-1 -:TAG_WIDTH] != tag && is_present )  begin
                 /*write miss - cache line clean or dirty*/
@@ -156,7 +156,6 @@ module direct_cache #(
             end
             else begin    // is_present == false
                 /* write miss cache line invalid*/
-                //$display("Write miss. Cache Line Invalid");
                 write_pending_ <= 1'b0;
                 cache_busy_ <= 1'b0;
                 data_vld_ <= 1'b0;
@@ -169,6 +168,7 @@ module direct_cache #(
         end
         else if (cache_busy_ && read_pending_) begin
             if(is_dirty && is_present) begin
+                //$display("Evicted address %h", addr_main_);
                 is_dirty <= 1'b0;
                 read_pending_ <= 1'b1;
                 cache_busy_ <= 1'b1;
@@ -189,6 +189,7 @@ module direct_cache #(
         end
         else if (cache_busy_ && write_pending_ ) begin
             if (is_dirty) begin
+                //$display("Evicted address %h", addr_main_);
                 is_dirty <= 1'b0;
                 write_pending_ <= 1'b1;
                 cache_busy_ <= 1'b1;
@@ -216,27 +217,27 @@ module direct_cache #(
     
     always@(posedge clk) begin
         if( flush ) begin
-            mem <= 'bx;
-            meta <= 'bx;
+            mem <= 'b0;
+            meta <= 'b0;
             write_pending_ <= 1'b0;
             read_pending_  <= 1'b0;
             cache_busy_ <= 1'b0;
             is_hit_ <= 1'b0;
             data_vld_ <= 1'b0;
-            data_ <= 'bx;
-            tag <= 'bx;
-            history <= 'bx;
-            write_extra_cycle_ = 1'bx;
-            cache_idx <= 'bx;
-            is_dirty <= 'bx;
-            is_present <= 'bx;
-            addr_main_en_ <= 'bx;
-            addr_main_ <= 'bx;
-            data_main_vld_ <= 'bx;
-            data_main_ <= 'bx;
-
+            data_ <= 'b0;
+            tag <= 'b0;
+            history <= 'b0;
+            write_extra_cycle_ = 1'b0;
+            cache_idx <= 'b0;
+            is_dirty <= 'b0;
+            is_present <= 'b0;
+            addr_main_en_ <= 'b0;
+            addr_main_ <= 'b0;
+            data_main_vld_ <= 'b0;
+            data_main_ <= 'b0;
         end
-
+    end
+/*
         if( !cache_busy_ && !addr_en ) begin
             write_pending_ <= 1'b0;
             read_pending_  <= 1'b0;
@@ -256,7 +257,7 @@ module direct_cache #(
             data_main_ <= 'bx;
         end 
     end
-   
+*/ 
     
     // Setting outputs
     //**************************************

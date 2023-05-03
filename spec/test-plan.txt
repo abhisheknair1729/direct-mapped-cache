@@ -1,0 +1,13 @@
+Tests will be a sequence of reads and writes. Important scenarios that must be tested are:
+
+1. Cache Line Eviction does not corrupt data
+2. Reads do not corrupt data
+3. Dirty data will be stored in the main memory before being evicted
+4. The mapping of addresses to cache lines is consistent
+5. Every read/write request completes in 2,3,4 cycles
+
+Some important coverage metrics are:
+
+1. Every data element in every cache line must be tested (written/read) atleast once
+2. Every cache line must be evicted atleast twice (once while clean, once while dirty)
+

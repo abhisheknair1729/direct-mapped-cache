@@ -32,7 +32,7 @@ Read and Write requests are sent by setting the address on the 'addr' bus, optio
 
 A hit in the cache (read or write) will take a single cycle. If the corresponding cache line is empty (holds invalid data) a write will take one cycle while a read will take two cycles.
 
-If the corresponding cache line is in a dirty state, the cache line will first have to be committed to main memory and then replaced. In such a case a reads and writes will take 3 cycles.
+If the corresponding cache line is in a dirty state, the cache line will first have to be committed to main memory and then replaced. In such a case a read will take 3 cycles and a write will take 4 cycles.
 
 If the corresonding cache line is not in a dirty state, the cache line can simply be replaced and so reads and writes take 2 cycles.
 

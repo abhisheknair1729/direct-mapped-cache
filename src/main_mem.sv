@@ -9,9 +9,13 @@ module main_mem #(parameter ADDR_WIDTH=16,
     inout wire [DATA_WIDTH-1:0] data;
     input wire data_vld;
     
+    parameter WORD_SIZE = 8;
+    parameter ADDR_MASK = 16'hFFFC; //Last two bits are zeroed out
+
     reg [DATA_WIDTH-1:0] data_;
     reg data_vld_;
-    parameter SIZE = 2 ** ADDR_WIDTH;
+    
+    parameter SIZE = 2 ** (ADDR_WIDTH - $clog2(DATA_WIDTH/WORD_SIZE));
 
     reg [SIZE-1:0][DATA_WIDTH-1:0] mem;
 
@@ -21,10 +25,10 @@ module main_mem #(parameter ADDR_WIDTH=16,
         end
         else begin
             if(addr_en && data_vld ) begin //write
-                mem[addr] <= data;
+                mem[addr & ADDR_MASK] <= data;
             end
             else if(addr_en) begin //read
-                data_ <= mem[addr];
+                data_ <= mem[addr & ADDR_MASK];
                 data_vld_ <= 1'b1;
             end
         end
